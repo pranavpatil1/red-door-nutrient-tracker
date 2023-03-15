@@ -65,7 +65,7 @@ CREATE TABLE ingr_details (
     sugars          NUMERIC(6, 2) NOT NULL,
     -- water is hydrating (+1), tea is slightly less (0.8)
     -- coffee is dehydrating (-0.5)
-    hydration_idx   NUMERIC(6, 2) NOT NULL,
+    hydration_idx   NUMERIC(2, 1) NOT NULL,
     -- how much of this ingredient we measured for (e.g. 100g of carrots)
     -- units grams
     per_amt         NUMERIC(6, 2) NOT NULL,
