@@ -8,13 +8,22 @@ DROP TABLE IF EXISTS community_member;
 DROP TABLE IF EXISTS user;
 
 -- a user, identified by uid, and any allergens they have
-CREATE TABLE user (
+CREATE TABLE user_info (
     uid                 INT PRIMARY KEY,
     full_name           VARCHAR(100) NOT NULL,
     dairy_allowed       TINYINT NOT NULL,
     gluten_allowed      TINYINT NOT NULL,
     seafood_allowed     TINYINT NOT NULL,
-    meat_allowed        TINYINT NOT NULL
+    meat_allowed        TINYINT NOT NULL,
+
+    -- now details related to admin/authentication
+    username VARCHAR(20) PRIMARY KEY,
+    -- Salt will be 8 characters all the time
+    salt CHAR(8) NOT NULL,
+    -- We use SHA-2 with 256-bit hashes. 
+    password_hash BINARY(64) NOT NULL,
+    -- whether they can modify other users
+    is_admin TINYINT NOT NULL
 );
 
 -- community members can optionally store
