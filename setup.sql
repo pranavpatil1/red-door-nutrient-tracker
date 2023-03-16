@@ -1,8 +1,10 @@
-DROP TABLE IF EXISTS ingr_details;
 DROP TABLE IF EXISTS recipe;
+DROP TABLE IF EXISTS ingr_details;
 DROP TABLE IF EXISTS orders_items;
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS item;
+DROP TABLE IF EXISTS student;
+DROP TABLE IF EXISTS community_member;
 DROP TABLE IF EXISTS user;
 
 -- a user, identified by uid, and any allergens they have
@@ -18,23 +20,27 @@ CREATE TABLE user (
 -- community members can optionally store
 -- credit card information with us
 CREATE TABLE community_member (
-    uid                 PRIMARY KEY REFERENCES user(uid),
+    uid                 INT PRIMARY KEY,
     credit_card_num     CHAR (16),
     expiration_date     DATE,
-    verification_code   CHAR(3)
+    verification_code   CHAR(3),
+    FOREIGN KEY (uid) REFERENCES user(uid) 
+        ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 -- students have a declining balance, usually 10000 for anytime
 CREATE TABLE student (
-    uid                 PRIMARY KEY REFERENCES user(uid),
+    uid                 INT PRIMARY KEY,
     balance             NUMERIC(7, 2) NOT NULL DEFAULT 10000,
+    FOREIGN KEY (uid) REFERENCES user(uid) 
+        ON UPDATE CASCADE ON DELETE CASCADE,
     CHECK (balance >= 0)
 );
 
 -- a menu item and its price
 CREATE TABLE item (
     item_id         SERIAL PRIMARY KEY,
-    item_name       VARCHAR(20) NOT NULL,
+    item_name       VARCHAR(40) NOT NULL,
     price_usd       NUMERIC(6, 2) NOT NULL,
     UNIQUE (item_name),
     CHECK (price_usd >= 0)
@@ -56,16 +62,6 @@ CREATE TABLE orders_items (
     order_id        BIGINT UNSIGNED REFERENCES orders(order_id),
     item_id         BIGINT UNSIGNED REFERENCES item(item_id),
     PRIMARY KEY (order_id, item_id)
-);
-
--- stores how much of each ingredient is in each item
--- similar problem to above where we can't enforce many-to-many
-CREATE TABLE recipe (
-    item_id         BIGINT UNSIGNED REFERENCES item(item_id),
-    ingredient_id   BIGINT UNSIGNED REFERENCES ingr_details(ingredient_id),
-    -- in grams
-    amount          NUMERIC(6, 2) NOT NULL,
-    PRIMARY KEY (item_id, ingredient_id)
 );
 
 -- for an ingredient, such as tomatoes or rice
@@ -98,4 +94,15 @@ CREATE TABLE ingr_details (
     -- between -1 and 1
     CHECK (hydration_idx >= -1),
     CHECK (hydration_idx <= 1)
+);
+
+
+-- stores how much of each ingredient is in each item
+-- similar problem to above where we can't enforce many-to-many
+CREATE TABLE recipe (
+    item_id         BIGINT UNSIGNED REFERENCES item(item_id),
+    ingredient_id   BIGINT UNSIGNED REFERENCES ingr_details(ingredient_id),
+    -- in grams
+    amount          NUMERIC(6, 2) NOT NULL,
+    PRIMARY KEY (item_id, ingredient_id)
 );
