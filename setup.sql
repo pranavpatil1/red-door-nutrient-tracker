@@ -12,8 +12,22 @@ CREATE TABLE user (
     dairy_allowed       TINYINT NOT NULL,
     gluten_allowed      TINYINT NOT NULL,
     seafood_allowed     TINYINT NOT NULL,
-    meat_allowed        TINYINT NOT NULL,
-    balance             NUMERIC(7, 2),
+    meat_allowed        TINYINT NOT NULL
+);
+
+-- community members can optionally store
+-- credit card information with us
+CREATE TABLE community_member (
+    uid                 PRIMARY KEY REFERENCES user(uid),
+    credit_card_num     CHAR (16),
+    expiration_date     DATE,
+    verification_code   CHAR(3)
+);
+
+-- students have a declining balance, usually 10000 for anytime
+CREATE TABLE student (
+    uid                 PRIMARY KEY REFERENCES user(uid),
+    balance             NUMERIC(7, 2) NOT NULL DEFAULT 10000,
     CHECK (balance >= 0)
 );
 
@@ -45,6 +59,7 @@ CREATE TABLE orders_items (
 );
 
 -- stores how much of each ingredient is in each item
+-- similar problem to above where we can't enforce many-to-many
 CREATE TABLE recipe (
     item_id         BIGINT UNSIGNED REFERENCES item(item_id),
     ingredient_id   BIGINT UNSIGNED REFERENCES ingr_details(ingredient_id),
