@@ -6,9 +6,30 @@ DROP TABLE IF EXISTS item;
 DROP TABLE IF EXISTS student;
 DROP TABLE IF EXISTS community_member;
 DROP TABLE IF EXISTS user;
+DROP TABLE IF EXISTS user_info;
+
+
+-- we leave this in a separate table because it is unclear how
+-- this code is tested, and we want to make it compatible with
+-- the original sp_add_user
+CREATE TABLE user_info (
+    -- Usernames are up to 20 characters.
+    username VARCHAR(20) PRIMARY KEY,
+
+    -- Salt will be 8 characters all the time, so we can make this 8.
+    salt CHAR(8) NOT NULL,
+
+    -- We use SHA-2 with 256-bit hashes.  MySQL returns the hash
+    -- value as a hexadecimal string, which means that each byte is
+    -- represented as 2 characters.  Thus, 256 / 8 * 2 = 64.
+    -- We can use BINARY or CHAR here; BINARY simply has a different
+    -- definition for comparison/sorting than CHAR.
+    password_hash BINARY(64) NOT NULL
+);
 
 -- a user, identified by uid, and any allergens they have
-CREATE TABLE user_info (
+-- also will be separately connected to user_info
+CREATE TABLE user (
     uid                 INT PRIMARY KEY,
     full_name           VARCHAR(100) NOT NULL,
     dairy_allowed       TINYINT NOT NULL,
@@ -17,13 +38,8 @@ CREATE TABLE user_info (
     meat_allowed        TINYINT NOT NULL,
 
     -- now details related to admin/authentication
-    username VARCHAR(20) PRIMARY KEY,
-    -- Salt will be 8 characters all the time
-    salt CHAR(8) NOT NULL,
-    -- We use SHA-2 with 256-bit hashes. 
-    password_hash BINARY(64) NOT NULL,
-    -- whether they can modify other users
-    is_admin TINYINT NOT NULL
+    username            VARCHAR(20) REFERENCES user_info (username),
+    is_admin            TINYINT NOT NULL DEFAULT 0
 );
 
 -- community members can optionally store

@@ -1,21 +1,5 @@
-UID,Full Name,Dairy allowed,Gluten allowed,Seafood allowed,Meat allowed
-2150000,Esther I Bethea,1,1,1,1
-2150001,Ronald V Gallman,1,1,1,1
-2150002,Raul K Hernandez,1,0,1,1
-2150003,Guadalupe I Moore,1,1,1,1
-2150004,Luther B Jeannotte,1,1,1,1
-2150005,Roger O Overholt,1,0,1,0
-2150006,Michael U Larson,1,1,1,1
-2150007,Jesse N Sanders,0,1,1,1
-2150008,Karen C Grant,1,1,1,1
-2150009,Andrew U Groves,1,1,1,1
-2150010,Kimberli F Amsden,1,1,1,1
-2150011,Donna P Irvin,0,1,1,1
-2150012,Jane J Payton,1,1,1,1
-2150013,Richard Q Mallin,1,1,1,1
-2150014,Edward B Shell,1,1,1,1
-2150015,Christopher J Cost,1,1,1,1
-2150016,Juliette P Page,1,0,1,1
-2150017,Thomas L Mcdowell,1,1,1,1
-2150018,Dante P Duffield,1,1,1,1
-2150019,Richard V Brown,1,1,1,1
+UID,Full Name,Dairy allowed,Gluten allowed,Seafood allowed,Meat allowed
+2150000,hovik,1,0,1,1,hovik,0
+2150001,pranav,1,0,1,0,pranav,0
+2150002,nisha,0,1,1,1,nisha,1
+2150003,john,1,0,1,1,john,1

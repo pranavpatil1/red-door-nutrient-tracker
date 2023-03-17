@@ -1,8 +1,7 @@
+CALL sp_add_user('hovik', 'ilovesql');
 CALL sp_add_user('pranav', 'ilovefood');
-CALL sp_add_user('nisha', 'ilovesql');
+CALL sp_add_user('nisha', 'ilovesoup');
 CALL sp_add_user('john', 'ilovereddoor');
-
-
 
 LOAD DATA LOCAL INFILE 'user.csv' INTO TABLE user
 FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\r\n' IGNORE 1 ROWS;
@@ -28,4 +27,10 @@ LOAD DATA LOCAL INFILE 'orders.csv' INTO TABLE orders
 FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\r\n' IGNORE 1 ROWS;
 
 LOAD DATA LOCAL INFILE 'orders_items.csv' INTO TABLE orders_items
+FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\r\n' IGNORE 1 ROWS;
+
+LOAD DATA LOCAL INFILE 'ingr_details.csv' INTO TABLE ingr_details
+FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\r\n' IGNORE 1 ROWS;
+
+LOAD DATA LOCAL INFILE 'recipe.csv' INTO TABLE recipe
 FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\r\n' IGNORE 1 ROWS;

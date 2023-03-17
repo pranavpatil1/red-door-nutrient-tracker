@@ -1,0 +1,6 @@
+ID,Ingredient Name,Protein (g),Carbs (g),Fats (g),Sugars (g),Hydration index (-1 to 1),Per amount (g),Has gluten,Has dairy,Has seafood,Has meat
+1,Flour,0,10,0,0,0,10,1,0,0,0
+2,Tomato,1,6,0,4,0.5,149,0,0,0,0
+3,Bread,0,10,0,3,0,10,1,0,0,0
+4,Avocado,3,13,22,1,0,201,0,0,0,0
+5,Meatball,12,5,20,1,0,85,0,0,0,1
