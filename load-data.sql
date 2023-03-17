@@ -1,7 +1,7 @@
 CALL sp_add_user('hovik', 'ilovesql');
 CALL sp_add_user('pranav', 'ilovefood');
 CALL sp_add_user('nisha', 'ilovesoup');
-CALL sp_add_user('john', 'ilovereddoor');
+CALL sp_add_user('jose', 'ilovereddoor');
 
 LOAD DATA LOCAL INFILE 'user.csv' INTO TABLE user
 FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\r\n' IGNORE 1 ROWS;
