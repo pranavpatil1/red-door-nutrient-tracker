@@ -28,15 +28,30 @@ FROM orders NATURAL JOIN orders_items NATURAL JOIN item
 WHERE order_id=13;
 
 -- what nutrients exist in order 13?
-SELECT  SUM(protein) as total_protein,
-        SUM(carbs) as total_carbs,
-        SUM(fats) as total_fats,
-        SUM(sugars) as total_sugars
-FROM    (SELECT nutrient_in_item(item_id, "protein") as protein,
-                nutrient_in_item(item_id, "carbs") as carbs,
-                nutrient_in_item(item_id, "fats") as fats,
-                nutrient_in_item(item_id, "sugars") as sugars
+SELECT  SUM(protein) AS total_protein,
+        SUM(carbs) AS total_carbs,
+        SUM(fats) AS total_fats,
+        SUM(sugars) AS total_sugars
+FROM    (SELECT nutrient_in_item(item_id, "protein") AS protein,
+                nutrient_in_item(item_id, "carbs") AS carbs,
+                nutrient_in_item(item_id, "fats") AS fats,
+                nutrient_in_item(item_id, "sugars") AS sugars
         FROM orders_items 
-        WHERE order = 13) as temp;
+        WHERE order = 13) AS temp;
         
 -- what are the total nutrients I got today?
+SELECT SUM(protein) AS total_protein,
+        SUM(carbs) AS total_carbs,
+        SUM(fats) AS total_fats,
+        SUM(sugars) AS total_sugars
+FROM    (SELECT nutrient_in_item(item_id, "protein") AS protein,
+                nutrient_in_item(item_id, "carbs") AS carbs,
+                nutrient_in_item(item_id, "fats") AS fats,
+                nutrient_in_item(item_id, "sugars") AS sugars
+        FROM    (SELECT item_id
+                FROM orders_items NATURAL JOIN (SELECT order_id 
+                                                FROM orders 
+                                                WHERE DATE(order_time) = CURDATE()) 
+                                                AS temp1) 
+                in temp2)
+        in temp3)
