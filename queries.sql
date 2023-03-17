@@ -53,5 +53,5 @@ FROM    (SELECT nutrient_in_item(item_id, "protein") AS protein,
                                                 FROM orders 
                                                 WHERE DATE(order_time) = CURDATE()) 
                                                 AS temp1) 
-                in temp2)
-        in temp3)
+                AS temp2)
+       AS temp3)
