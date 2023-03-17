@@ -217,11 +217,11 @@ def show_options():
         login_prompt()
     elif ans == 'x' and auth.logged_in():
         logout_prompt()
-    elif ans == 'n' and auth.logged_in() and auth.is_admin():
+    elif ans == 'n' and auth.logged_in() and auth.check_admin():
         pass
-    elif ans == 'c' and auth.logged_in() and not auth.is_admin():
-        pass
-    elif ans == 'v' and auth.logged_in() and not auth.is_admin():
+    elif ans == 'c' and auth.logged_in() and not auth.check_admin():
+        create_order_menu()
+    elif ans == 'v' and auth.logged_in() and not auth.check_admin():
         pass
     else:
         print ("Invalid option")
@@ -268,6 +268,58 @@ def show_menu():
         print (f"{item_name.ljust(30)}${price_usd}")
 
     print ()
+
+def create_order_menu():
+    menu = get_menu()
+    order_ids = set()
+
+    if not auth.logged_in():
+        print ("What are you doing here???")
+        return
+
+    print ("Let's create your order!")
+
+    while True:
+        print ()
+        # print menu at the beginning always
+        for i in range(len(menu)):
+            item_id, item_name, price_usd = menu[i]
+            print (f"[{i+1}] {item_name.ljust(30)}${price_usd}")
+        print ('[s] Submit')
+        print ('[c] Cancel')
+        print ()
+
+        # prompt for which they want
+        ans = input('What would you like to add? (or repeat an option to remove it): ').lower()
+
+        # stop asking for new stuff
+        if ans == 's':
+            break
+        elif ans == 'c':
+            return
+        try:
+            ans_num = int(ans)
+            if ans_num >= 1 and ans_num <= len(menu):
+                if ans_num-1 not in order_ids:
+                    order_ids.add(ans_num-1)
+                    print (f"Adding {menu[ans_num-1][1]}")
+                else:
+                    order_ids.remove(ans_num-1)
+                    print (f"Removing {menu[ans_num-1][1]}")
+            else:
+                print ("Invalid input")
+                continue
+        except:
+            print ("Invalid input")
+            continue
+        print ()
+        print (f"Here's what you have so far: {', '.join([menu[i][1] for i in order_ids])}")
+        print (f"Your subtotal (pre-tax) is: ${sum([menu[i][2] for i in order_ids]):.2f}")
+        print ()
+        print ("What's your next item?")
+
+    send_order_out(",".join(order_ids))
+    print ("Submitted order!")
 
 def quit_ui():
     """
