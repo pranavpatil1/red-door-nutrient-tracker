@@ -27,7 +27,16 @@ SELECT ROUND(SUM(price_usd)*1.1, 2) AS final_price
 FROM orders NATURAL JOIN orders_items NATURAL JOIN item 
 WHERE order_id=13;
 
--- what nutrients did I get from order 13?
-
-
+-- what nutrients exist in order 13?
+SELECT  SUM(protein) as total_protein,
+        SUM(carbs) as total_carbs,
+        SUM(fats) as total_fats,
+        SUM(sugars) as total_sugars
+FROM    (SELECT nutrient_in_item(item_id, "protein") as protein,
+                nutrient_in_item(item_id, "carbs") as carbs,
+                nutrient_in_item(item_id, "fats") as fats,
+                nutrient_in_item(item_id, "sugars") as sugars
+        FROM orders_items 
+        WHERE order = 13) as temp;
+        
 -- what are the total nutrients I got today?
