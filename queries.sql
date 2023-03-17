@@ -32,10 +32,10 @@ SELECT  SUM(protein) AS total_protein,
         SUM(carbs) AS total_carbs,
         SUM(fats) AS total_fats,
         SUM(sugars) AS total_sugars
-FROM    (SELECT nutrient_in_item(item_id, "protein") AS protein,
-                nutrient_in_item(item_id, "carbs") AS carbs,
-                nutrient_in_item(item_id, "fats") AS fats,
-                nutrient_in_item(item_id, "sugars") AS sugars
+FROM    (SELECT protein_in_item(item_id) AS protein,
+                carbs_in_item(item_id) AS carbs,
+                fats_in_item(item_id) AS fats,
+                sugars_in_item(item_id) AS sugars
         FROM orders_items 
         WHERE order_id = 13) AS temp;
         
@@ -44,10 +44,10 @@ SELECT SUM(protein) AS total_protein,
         SUM(carbs) AS total_carbs,
         SUM(fats) AS total_fats,
         SUM(sugars) AS total_sugars
-FROM    (SELECT nutrient_in_item(item_id, "protein") AS protein,
-                nutrient_in_item(item_id, "carbs") AS carbs,
-                nutrient_in_item(item_id, "fats") AS fats,
-                nutrient_in_item(item_id, "sugars") AS sugars
+FROM    (SELECT protein_in_item(item_id) AS protein,
+                carbs_in_item(item_id) AS carbs,
+                fats_in_item(item_id) AS fats,
+                sugars_in_item(item_id) AS sugars
         FROM    (SELECT item_id
                 FROM orders_items NATURAL JOIN (SELECT order_id 
                                                 FROM orders 
