@@ -178,6 +178,33 @@ def login(username, password):
         else:
             sys.stderr('Login check failed. Please contact an administrator.')
 
+def send_order_out(item_ids):
+    """
+    creates an order with the specified item_ids in iterable
+    """
+    if len(item_ids) == 0:
+        print ("You can't have an empty order!")
+        return
+    
+    if not auth.logged_in():
+        print ("How did you get here???")
+        return
+    
+    sql = 'CALL create_order(\'%s\', \'%s\');' % (auth.authenticated_user, ",".join([str(x) for x in item_ids]), )
+    print (sql)
+
+    cursor = conn.cursor()
+    try:
+        cursor.execute(sql)
+        conn.commit()
+    except mysql.connector.Error as err:
+        # If you're testing, it's helpful to see more details printed.
+        if DEBUG:
+            sys.stderr(err)
+            sys.exit(1)
+        else:
+            sys.stderr('Menu get failed. Please contact an administrator.')
+
 
 # ----------------------------------------------------------------------
 # Command-Line Functionality
@@ -270,6 +297,10 @@ def show_menu():
     print ()
 
 def create_order_menu():
+    """
+    prompts for all items that user wants to add to the order
+    then submits order!
+    """
     menu = get_menu()
     order_ids = set()
 
@@ -318,7 +349,7 @@ def create_order_menu():
         print ()
         print ("What's your next item?")
 
-    send_order_out(",".join(order_ids))
+    send_order_out([menu[i][0] for i in order_ids])
     print ("Submitted order!")
 
 def quit_ui():
