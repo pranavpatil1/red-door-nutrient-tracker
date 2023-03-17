@@ -37,7 +37,7 @@ FROM    (SELECT nutrient_in_item(item_id, "protein") AS protein,
                 nutrient_in_item(item_id, "fats") AS fats,
                 nutrient_in_item(item_id, "sugars") AS sugars
         FROM orders_items 
-        WHERE order = 13) AS temp;
+        WHERE order_id = 13) AS temp;
         
 -- what are the total nutrients I got today?
 SELECT SUM(protein) AS total_protein,
@@ -54,4 +54,4 @@ FROM    (SELECT nutrient_in_item(item_id, "protein") AS protein,
                                                 WHERE DATE(order_time) = CURDATE()) 
                                                 AS temp1) 
                 AS temp2)
-       AS temp3)
+       AS temp3
