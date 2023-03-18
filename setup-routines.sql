@@ -4,6 +4,7 @@ DROP FUNCTION IF EXISTS fats_in_item;
 DROP FUNCTION IF EXISTS sugars_in_item;
 DROP FUNCTION IF EXISTS access_idx;
 DROP PROCEDURE IF EXISTS create_order;
+DROP PROCEDURE IF EXISTS create_menu_item;
 
 -- UDFs
 
@@ -97,11 +98,11 @@ END !
 DELIMITER ;
 
 -- Procedures
-DELIMITER !
 
 -- this will create a completely new order
 -- item_ids is a string of a list of items like '1,2,5,7'   
 -- it will create elements in orders_items for each item_id in string!!
+DELIMITER !
 CREATE PROCEDURE create_order(username VARCHAR(20), item_ids TEXT)
 BEGIN
   DECLARE user_uid BIGINT UNSIGNED;
@@ -129,34 +130,36 @@ BEGIN
 END !
 DELIMITER ;
 
--- -- this will create a new menu item
--- -- item_ids is a string of a list of items like '1,2,5,7'   
--- -- it will create elements in orders_items for each item_id in string!!
--- CREATE PROCEDURE create_menu_item(name VARCHAR(40), price NUMERIC(6, 2), ingr_ids TEXT)
--- BEGIN
---   DECLARE user_uid BIGINT UNSIGNED;
---   DECLARE new_order_id BIGINT UNSIGNED;
+-- this will create a new menu item
+-- item_ids is a string of a list of items like '1,2,5,7'   
+-- it will create elements in orders_items for each item_id in string!!
 
---   -- get uid for user from username
---   SELECT uid FROM user WHERE user.username = username INTO user_uid;
-  
---   -- add to orders table, allow order_id to autogenerate
---   INSERT INTO orders(uid, order_time) VALUES (user_uid, NOW());
+DELIMITER !
+CREATE PROCEDURE create_menu_item(food_name VARCHAR(40), price NUMERIC(6, 2), ingr_ids TEXT, amounts TEXT)
+BEGIN
+  DECLARE new_item_id BIGINT UNSIGNED;
 
---   -- get the order_id that just generated
---   SELECT order_id 
---   FROM orders 
---   WHERE order_time = (
---     SELECT MAX(order_time) AS order_time FROM orders
---   ) INTO new_order_id;
+  -- add to item table, allow item_id to autogenerate
+  INSERT INTO item(item_name, price_usd) VALUES (food_name, price);
 
---   -- the select statement will get the item ids that are included in the string
---   -- it will insert a row for every set
---   INSERT INTO orders_items (order_id, item_id) 
---   SELECT new_order_id, item_id 
---   FROM item 
---   WHERE FIND_IN_SET(item_id, item_ids);
--- END !
--- DELIMITER ;
+  -- get the order_id that just generated
+  SELECT item_id 
+  FROM item 
+  WHERE item_name = food_name 
+  INTO new_item_id;
+
+  -- the select statement will get the ingr ids that are included in the string
+  -- it will insert a row for every set
+  -- for each ingr that it inserts, it will locate the price by getting the index
+  -- of the ingredient id and finding the corresponding price element at that index
+  INSERT INTO recipe (item_id, ingredient_id, amount) 
+  SELECT 
+    new_item_id AS item_id, 
+    ingredient_id, 
+    access_idx(amounts, FIND_IN_SET(ingredient_id, ingr_ids)) AS amount
+  FROM ingr_details 
+  WHERE FIND_IN_SET(ingredient_id, ingr_ids);
+END !
+DELIMITER ;
 
 -- Triggers
