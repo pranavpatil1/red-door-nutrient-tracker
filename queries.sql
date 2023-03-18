@@ -43,6 +43,6 @@ SELECT SUM(protein_in_item(item_id)) AS total_protein,
 FROM    (SELECT item_id
         FROM orders_items NATURAL JOIN (SELECT order_id 
                                         FROM orders 
-                                        WHERE DATE(order_time) = CURDATE()) 
+                                        WHERE DATE(order_time) = CURDATE() and username='pranav') 
                                         AS temp1) 
         AS temp2;
