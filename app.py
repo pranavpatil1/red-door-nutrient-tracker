@@ -191,7 +191,6 @@ def send_order_out(item_ids):
         return
     
     sql = 'CALL create_order(\'%s\', \'%s\');' % (auth.authenticated_user, ",".join([str(x) for x in item_ids]), )
-    print (sql)
 
     cursor = conn.cursor()
     try:

@@ -28,30 +28,21 @@ FROM orders NATURAL JOIN orders_items NATURAL JOIN item
 WHERE order_id=13;
 
 -- what nutrients exist in order 13?
-SELECT  SUM(protein) AS total_protein,
-        SUM(carbs) AS total_carbs,
-        SUM(fats) AS total_fats,
-        SUM(sugars) AS total_sugars
-FROM    (SELECT protein_in_item(item_id) AS protein,
-                carbs_in_item(item_id) AS carbs,
-                fats_in_item(item_id) AS fats,
-                sugars_in_item(item_id) AS sugars
-        FROM orders_items 
-        WHERE order_id = 13) AS temp;
+SELECT  SUM(protein_in_item(item_id)) AS total_protein,
+        SUM(carbs_in_item(item_id)) AS total_carbs,
+        SUM(fats_in_item(item_id)) AS total_fats,
+        SUM(sugars_in_item(item_id)) AS total_sugars
+FROM orders_items 
+WHERE order_id = 13;
         
 -- what are the total nutrients I got today?
-SELECT SUM(protein) AS total_protein,
-        SUM(carbs) AS total_carbs,
-        SUM(fats) AS total_fats,
-        SUM(sugars) AS total_sugars
-FROM    (SELECT protein_in_item(item_id) AS protein,
-                carbs_in_item(item_id) AS carbs,
-                fats_in_item(item_id) AS fats,
-                sugars_in_item(item_id) AS sugars
-        FROM    (SELECT item_id
-                FROM orders_items NATURAL JOIN (SELECT order_id 
-                                                FROM orders 
-                                                WHERE DATE(order_time) = CURDATE()) 
-                                                AS temp1) 
-                AS temp2)
-       AS temp3
+SELECT SUM(protein_in_item(item_id)) AS total_protein,
+        SUM(carbs_in_item(item_id)) AS total_carbs,
+        SUM(fats_in_item(item_id)) AS total_fats,
+        SUM(sugars_in_item(item_id)) AS total_sugars
+FROM    (SELECT item_id
+        FROM orders_items NATURAL JOIN (SELECT order_id 
+                                        FROM orders 
+                                        WHERE DATE(order_time) = CURDATE()) 
+                                        AS temp1) 
+        AS temp2;
