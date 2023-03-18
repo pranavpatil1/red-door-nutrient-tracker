@@ -104,8 +104,10 @@ def check_admin_priv(username):
 
 def get_menu():
     """
-    displays the menu items and prices. if there is a user logged in, 
+    get the menu items and prices. if there is a user logged in, 
     it will automatically order by the most often ordered thing
+
+    returns list of tuples of (id, name, price) for each menu item
     """
     if auth.logged_in():
         # Remember to pass arguments as a tuple like so to prevent SQL
@@ -142,6 +144,31 @@ def get_menu():
             sys.exit(1)
         else:
             sys.stderr('Menu get failed. Please contact an administrator.')
+
+def get_ingredients():
+    """
+    get the ingredients and all relevant details
+
+    returns list of tuples of (id, name) of ingredients
+    """
+    sql = 'SELECT ingredient_id, ingredient_name FROM ingr_details;'
+
+    cursor = conn.cursor()
+    try:
+        cursor.execute(sql)
+        # row = cursor.fetchone()
+        rows = cursor.fetchall()
+        menu = []
+        for row in rows:
+            menu.append(row)
+        return menu
+    except mysql.connector.Error as err:
+        # If you're testing, it's helpful to see more details printed.
+        if DEBUG:
+            sys.stderr(err)
+            sys.exit(1)
+        else:
+            sys.stderr('Ingredients get failed. Please contact an administrator.')
 
 # ----------------------------------------------------------------------
 # Functions for Logging Users In
@@ -202,8 +229,36 @@ def send_order_out(item_ids):
             sys.stderr(err)
             sys.exit(1)
         else:
-            sys.stderr('Menu get failed. Please contact an administrator.')
+            sys.stderr('Order creation failed. Please contact an administrator.')
 
+def submit_menu_item (name, price, ingr_and_amounts):
+    """
+    name:
+        name of menu item
+    price:
+        price of menu item
+    ingr_and_amounts:
+        list of (ingredient id, amount of ingredient)
+    """
+    
+    sql = 'CALL create_menu_item(\'%s\', %.2f, "%s", "%s");' % (
+        name, 
+        price, 
+        ",".join([str(x[0]) for x in ingr_and_amounts]),
+        ",".join(["{:.2f}".format(x[1]) for x in ingr_and_amounts]),
+    )
+
+    cursor = conn.cursor()
+    try:
+        cursor.execute(sql)
+        conn.commit()
+    except mysql.connector.Error as err:
+        # If you're testing, it's helpful to see more details printed.
+        if DEBUG:
+            sys.stderr(err)
+            sys.exit(1)
+        else:
+            sys.stderr('Menu item creation failed. Please contact an administrator.')
 
 # ----------------------------------------------------------------------
 # Command-Line Functionality
@@ -244,7 +299,7 @@ def show_options():
     elif ans == 'x' and auth.logged_in():
         logout_prompt()
     elif ans == 'n' and auth.logged_in() and auth.check_admin():
-        pass
+        create_menu_item()
     elif ans == 'c' and auth.logged_in() and not auth.check_admin():
         create_order_menu()
     elif ans == 'v' and auth.logged_in() and not auth.check_admin():
@@ -350,6 +405,70 @@ def create_order_menu():
 
     send_order_out([menu[i][0] for i in order_ids])
     print ("Submitted order!")
+
+
+def create_menu_item():
+    """
+    prompts for all items that user wants to add to the order
+    then submits order!
+    """
+    ingredients = get_ingredients()
+    ingr_amts = {}
+
+    if not auth.logged_in() or not auth.check_admin():
+        print ("What are you doing here???")
+        return
+
+    print ("Let's create a menu item!")
+    item_name = input("What is the name of the new menu item? ")
+    try:
+        item_price = float(input(f"What is the price of {item_name}? "))
+    except:
+        print ("Error: invalid price. ")
+        return
+
+    while True:
+        print ()
+        # print menu at the beginning always
+        for i in range(len(ingredients)):
+            ingr_id, ingr_name = ingredients[i]
+            print (f"[{i+1}] {ingr_name}")
+        print ('[s] Submit')
+        print ('[c] Cancel')
+        print ()
+
+        # prompt for which they want
+        ans = input('What would you like to add? (or repeat an option to remove it): ').lower()
+
+        # stop asking for new stuff
+        if ans == 's':
+            break
+        elif ans == 'c':
+            return
+        try:
+            ans_num = int(ans)
+            amount = float(input("How much of this ingredient do you want (in grams): "))
+        except:
+            print ("Invalid input")
+            continue
+        if ans_num >= 1 and ans_num <= len(ingredients):
+            ingr_name = ingredients[ans_num-1][1]
+            if ans_num-1 not in ingr_amts:
+                ingr_amts[ans_num-1] = amount
+                print (f"Adding {amount:.2f} of {ingr_name}")
+            else:
+                del ingr_amts[ans_num-1]
+                print (f"Removing {ingr_name}")
+        else:
+            print ("Invalid input")
+            continue
+        print ()
+        print (f"Here's what you have so far: {', '.join([f'{ingredients[i][1]} ({ingr_amts[i]:.2f}g)' for i in ingr_amts])}")
+        print ()
+        print ("What's your next ingredient?")
+
+    submit_menu_item(item_name, item_price, [(ingredients[i][0], ingr_amts[i]) for i in ingr_amts])
+    print ("Created menu item!")
 
 def quit_ui():
     """
