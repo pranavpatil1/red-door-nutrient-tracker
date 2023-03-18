@@ -218,7 +218,7 @@ def show_options():
     print('What would you like to do? ')
     
     print('  (m) - View menu')
-    print('  (d) - Get nutrients and price of a menu item')
+    print('  (d) - Get nutrients of a menu item')
     if not auth.logged_in():
         print('  (l) - Log in')
     elif not auth.check_admin():
