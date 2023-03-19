@@ -380,10 +380,6 @@ def get_nutrients():
     menu = get_menu()
     order_ids = set()
 
-    if not auth.logged_in():
-        print ("What are you doing here???")
-        return
-
     print ("Let's find your nutrients!")
 
     while True:
