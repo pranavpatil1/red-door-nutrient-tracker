@@ -231,6 +231,43 @@ def send_order_out(item_ids):
         else:
             sys.stderr('Order creation failed. Please contact an administrator.')
 
+    sql = 'SELECT balance FROM student NATURAL JOIN user WHERE username = \'%s\';' % (auth.authenticated_user)
+    
+    cursor = conn.cursor()
+    try:
+        cursor.execute(sql)
+        rows = cursor.fetchall()
+        if len(rows) != 0:
+            for row in rows:
+                balance = row[0]
+                return "Your remaining student balance is $" + str(balance) + "."
+    except mysql.connector.Error as err:
+        # If you're testing, it's helpful to see more details printed.
+        if DEBUG:
+            sys.stderr(err)
+            sys.exit(1)
+        else:
+            sys.stderr('Login check failed. Please contact an administrator.')
+
+    sql = 'SELECT credit_card_num FROM community_member NATURAL JOIN user WHERE username = \'%s\';' % (auth.authenticated_user)
+
+    cursor = conn.cursor()
+    try:
+        cursor.execute(sql)
+        rows = cursor.fetchall()
+        if len(rows) != 0:
+            for row in rows:
+                card = row[0]
+                return str(card[-4:])
+    except mysql.connector.Error as err:
+        # If you're testing, it's helpful to see more details printed.
+        if DEBUG:
+            sys.stderr(err)
+            sys.exit(1)
+        else:
+            sys.stderr('Login check failed. Please contact an administrator.')
+
+
 def submit_menu_item (name, price, ingr_and_amounts):
     """
     name:
@@ -303,7 +340,7 @@ def show_options():
     if not auth.logged_in():
         print('  (l) - Log in')
     elif not auth.check_admin():
-        print('  (v) - View my order history')
+        # print('  (v) - View my order history')
         print('  (c) - Create an order')
         print('  (x) - Log out')
     else:
@@ -328,8 +365,8 @@ def show_options():
         create_menu_item()
     elif ans == 'c' and auth.logged_in() and not auth.check_admin():
         create_order_menu()
-    elif ans == 'v' and auth.logged_in() and not auth.check_admin():
-        pass
+    # elif ans == 'v' and auth.logged_in() and not auth.check_admin():
+    #     pass
     else:
         print ("Invalid option")
 
@@ -379,6 +416,10 @@ def show_menu():
 def get_nutrients():
     menu = get_menu()
     order_ids = set()
+
+    if not auth.logged_in():
+        print ("What are you doing here???")
+        return
 
     print ("Let's find your nutrients!")
 
@@ -471,8 +512,12 @@ def create_order_menu():
         print ()
         print ("What's your next item?")
 
-    send_order_out([menu[i][0] for i in order_ids])
+    payment = send_order_out([menu[i][0] for i in order_ids])
     print ("Submitted order!")
+    if len(payment) == 4:
+        print("The following amount was charged to your credit card ************" + payment + f": ${sum([menu[i][2] for i in order_ids]):.2f}")
+    else:
+        print (payment)
 
 
 def create_menu_item():
