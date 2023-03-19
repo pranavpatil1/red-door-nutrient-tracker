@@ -163,3 +163,21 @@ END !
 DELIMITER ;
 
 -- Triggers
+DELIMITER !
+CREATE TRIGGER update_balance AFTER INSERT ON orders_items FOR EACH ROW
+BEGIN
+    DECLARE item_price NUMERIC(6, 2);
+    DECLARE order_uid INT;
+
+    SELECT price_usd INTO item_price
+    FROM item
+    WHERE item_id = NEW.item_id;
+
+    SELECT uid INTO order_uid
+    FROM orders
+    WHERE order_id = NEW.order_id;
+
+    UPDATE student SET student.balance = student.balance - item_price
+    WHERE student.uid = order_uid;
+END !
+DELIMITER ;
