@@ -322,6 +322,38 @@ def retrieve_nutrients_of_item (item_id):
         else:
             sys.stderr('Nutrients get failed. Please contact an administrator.')
 
+def retrieve_allergens_of_item (item_id):
+    """
+    item_name:
+        name of the menu item
+    """
+
+    sql = 'SELECT SUM(has_gluten) > 0 AS has_gluten, SUM(has_dairy) > 0 AS has_dairy, SUM(has_seafood) > 0 as has_seafood, SUM(has_meat) > 0 as has_meat FROM item NATURAL JOIN recipe NATURAL JOIN ingr_details WHERE item_id = "%s";' % (item_id)
+
+    cursor = conn.cursor()
+    try:
+        cursor.execute(sql)
+        # row = cursor.fetchone()
+        rows = cursor.fetchall()
+        (gluten, dairy, seafood, meat) = (rows[0])
+        allergens = ""
+        if gluten == 1:
+            allergens = allergens + "gluten, "
+        if dairy == 1:
+            allergens = allergens + "dairy, "
+        if seafood == 1:
+            allergens = allergens + "seafood, "
+        if meat == 1:
+            allergens = allergens + "meat, "
+        return allergens
+    except mysql.connector.Error as err:
+        # If you're testing, it's helpful to see more details printed.
+        if DEBUG:
+            sys.stderr(err)
+            sys.exit(1)
+        else:
+            sys.stderr('Nutrients get failed. Please contact an administrator.')
+
 
 # ----------------------------------------------------------------------
 # Command-Line Functionality
@@ -417,10 +449,6 @@ def get_nutrients():
     menu = get_menu()
     order_ids = set()
 
-    if not auth.logged_in():
-        print ("What are you doing here???")
-        return
-
     print ("Let's find your nutrients!")
 
     while True:
@@ -450,6 +478,8 @@ def get_nutrients():
 
     nutrients = retrieve_nutrients_of_item(item_id)
 
+    allergens = retrieve_allergens_of_item(item_id)
+
     print('Here are the nutrients for your item:')
     print()
     
@@ -458,6 +488,11 @@ def get_nutrients():
         print (f"{c} grams of carbs")
         print (f"{f} grams of fat")
         print (f"{s} grams of sugar")
+
+    if len(allergens) == 0:
+        print('This item contains no allergens.')
+    else:
+        print('The allergens of this item are ' + allergens[:-2 ] + ".")
 
 def create_order_menu():
     """
