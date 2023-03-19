@@ -8,6 +8,7 @@ DROP PROCEDURE IF EXISTS create_menu_item;
 
 -- UDFs
 
+-- retrieves the amount of protein in an item
 DELIMITER !
 CREATE FUNCTION protein_in_item (
     given_tem_id SERIAL
@@ -24,6 +25,7 @@ BEGIN
 END !
 DELIMITER ;
 
+-- retrieves the amount of carbs in an item
 DELIMITER !
 CREATE FUNCTION carbs_in_item (
     given_tem_id SERIAL
@@ -40,6 +42,7 @@ BEGIN
 END !
 DELIMITER ;
 
+-- retrieves the amount of fats in an item
 DELIMITER !
 CREATE FUNCTION fats_in_item (
     given_tem_id SERIAL
@@ -56,6 +59,7 @@ BEGIN
 END !
 DELIMITER ;
 
+-- retrieves the amount of sugar in an item
 DELIMITER !
 CREATE FUNCTION sugars_in_item (
     given_tem_id SERIAL
@@ -163,6 +167,9 @@ END !
 DELIMITER ;
 
 -- Triggers
+
+-- updates the student balance whenever an order is created
+-- if the user is not a student, it does not change anything
 DELIMITER !
 CREATE TRIGGER update_balance AFTER INSERT ON orders_items FOR EACH ROW
 BEGIN
