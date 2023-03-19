@@ -1,6 +1,7 @@
 import argparse
 import csv
 import random
+from datetime import datetime, timedelta
 
 # # this will create a csv for the file provided
 # parser = argparse.ArgumentParser(
@@ -70,8 +71,9 @@ with open ("item.csv", "w", newline='') as uf:
         writer.writerow(item)
 
 
+num_orders = 5000
 orders = [
-    [i+1, 2150000+(i%4), f"2023-03-15 12:{i+10}:01"] for i in range(30)
+    [i+1, 2150000+(i%4), (datetime.now()+timedelta(minutes=-num_orders+i)).strftime("%Y-%m-%d %H:%M:%S")] for i in range(num_orders)
 ]
 
 with open ("orders.csv", "w", newline='') as uf:
@@ -89,10 +91,10 @@ with open ("orders.csv", "w", newline='') as uf:
 
 orders_items = []
 
-for i in range(1, 11):
+for i in range(1, len(orders) // 2):
     orders_items.append([i, ((i-1)%4)+1])
 
-for i in range(11, 31):
+for i in range(len(orders) // 2, len(orders)):
     if i % 2 == 0:
         orders_items.append([i, 1])
         orders_items.append([i, 3])

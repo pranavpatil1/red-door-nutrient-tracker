@@ -46,3 +46,25 @@ FROM    (SELECT item_id
                                         WHERE DATE(order_time) = CURDATE() and username='pranav') 
                                         AS temp1) 
         AS temp2;
+
+-- which items have gluten? (easily expanded to other allergens)
+SELECT 
+    item_name, 
+    SUM(has_gluten) > 0 AS has_gluten 
+FROM item NATURAL JOIN recipe NATURAL JOIN ingr_details 
+GROUP BY item_id;
+
+-- who is red door's most loyal customer? (who ordered the most)
+SELECT username, COUNT(*) AS num_orders 
+FROM orders NATURAL JOIN user 
+GROUP BY uid
+-- compare each of the orders to the max, list those that are equal
+HAVING COUNT(*) = (
+    -- find out the maximum number of orders
+    SELECT MAX(num_orders) AS max_orders
+    FROM (
+        SELECT COUNT(*) AS num_orders 
+        FROM orders NATURAL JOIN user 
+        GROUP BY uid
+    ) AS temp1
+);

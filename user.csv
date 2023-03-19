@@ -1,5 +1,5 @@
 UID,Full Name,Dairy allowed,Gluten allowed,Seafood allowed,Meat allowed
 2150000,hovik,1,0,1,1,hovik,0
-2150001,pranav,1,0,1,0,pranav,0
-2150002,nisha,0,1,1,1,nisha,1
-2150003,john,1,0,1,1,john,1
+2150001,pranav,1,1,0,1,pranav,0
+2150002,nisha,1,1,0,1,nisha,1
+2150003,john,0,1,1,1,john,1
