@@ -340,7 +340,7 @@ def show_options():
     if not auth.logged_in():
         print('  (l) - Log in')
     elif not auth.check_admin():
-        print('  (v) - View my order history')
+        # print('  (v) - View my order history')
         print('  (c) - Create an order')
         print('  (x) - Log out')
     else:
@@ -365,8 +365,8 @@ def show_options():
         create_menu_item()
     elif ans == 'c' and auth.logged_in() and not auth.check_admin():
         create_order_menu()
-    elif ans == 'v' and auth.logged_in() and not auth.check_admin():
-        pass
+    # elif ans == 'v' and auth.logged_in() and not auth.check_admin():
+    #     pass
     else:
         print ("Invalid option")
 
