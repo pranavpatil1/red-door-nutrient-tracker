@@ -104,10 +104,11 @@ def check_admin_priv(username):
 
 def get_menu():
     """
-    get the menu items and prices. if there is a user logged in, 
-    it will automatically order by the most often ordered thing
+    Gets the menu items and prices. If there is a user logged in, 
+    it will automatically order by the most often ordered items.
 
-    returns list of tuples of (id, name, price) for each menu item
+    Returns:
+        get_menu(): list of tuples of (id, name, price) for each menu item
     """
     if auth.logged_in():
         # Remember to pass arguments as a tuple like so to prevent SQL
@@ -147,9 +148,10 @@ def get_menu():
 
 def get_ingredients():
     """
-    get the ingredients and all relevant details
+    Gets the ingredients and all relevant details.
 
-    returns list of tuples of (id, name) of ingredients
+    Returns:
+        get_ingredients(): list of tuples of (id, name) of ingredients
     """
     sql = 'SELECT ingredient_id, ingredient_name FROM ingr_details;'
 
@@ -207,7 +209,16 @@ def login(username, password):
 
 def send_order_out(item_ids):
     """
-    creates an order with the specified item_ids in iterable
+    Creates an order with the included item_ids
+    
+    Parameters:
+        item_ids: A list of item_ids to include in the order
+        
+    Returns:
+        send_order_out(item_ids): if the user is a student, returns
+        containing the remaining balance; if the user is a community
+        member, returns a string containing the last 4 digits of the
+        user's credit card.
     """
     if len(item_ids) == 0:
         print ("You can't have an empty order!")
@@ -270,12 +281,16 @@ def send_order_out(item_ids):
 
 def submit_menu_item (name, price, ingr_and_amounts):
     """
-    name:
-        name of menu item
-    price:
-        price of menu item
-    ingr_and_amounts:
-        list of (ingredient id, amount of ingredient)
+    Inserts an item into the items relation. Updates the recipe 
+    relation to include the new item.
+    
+    Parameters:
+        name:
+            name of menu item
+        price:
+            price of menu item
+        ingr_and_amounts:
+            list of (ingredient id, amount of ingredient)
     """
     
     sql = 'CALL create_menu_item(\'%s\', %.2f, "%s", "%s");' % (
@@ -299,8 +314,14 @@ def submit_menu_item (name, price, ingr_and_amounts):
 
 def retrieve_nutrients_of_item (item_id):
     """
-    item_name:
-        name of the menu item
+     When provided an item_id, retrieves the nutrients of the item with a SQL Select query.
+    
+    Parameters:
+        item_id: the database ID of the item we are interested in finding the allergens of
+        
+    Returns:
+        retrieve_nutrients_of_item (item_id): a formatted string containing the nutrients of
+        the particular item; returns an empty string if there are no nutrients
     """
 
     sql = 'SELECT protein_in_item(item_id) AS total_protein, carbs_in_item(item_id) AS total_carbs, fats_in_item(item_id) AS total_fats, sugars_in_item(item_id) AS total_sugars FROM item WHERE item_id = "%s";' % (item_id)
@@ -324,8 +345,14 @@ def retrieve_nutrients_of_item (item_id):
 
 def retrieve_allergens_of_item (item_id):
     """
-    item_name:
-        name of the menu item
+    When provided an item_id, retrieves the allergens of the item with a SQL Select query.
+    
+    Parameters:
+        item_id: the database ID of the item we are interested in finding the allergens of
+        
+    Returns:
+        retrieve_allergens_of_item (item_id): a formatted string containing the allergens of
+        the particular item; returns an empty string if there are no allergens
     """
 
     sql = 'SELECT SUM(has_gluten) > 0 AS has_gluten, SUM(has_dairy) > 0 AS has_dairy, SUM(has_seafood) > 0 as has_seafood, SUM(has_meat) > 0 as has_meat FROM item NATURAL JOIN recipe NATURAL JOIN ingr_details WHERE item_id = "%s";' % (item_id)
@@ -405,7 +432,7 @@ def show_options():
 
 def login_prompt():
     """
-    asks for username and password but hides password with *****
+    Asks for username and password but hides password with *****
     will attempt to login
     """
     user_input = input('Enter your username: ')
@@ -422,7 +449,7 @@ def login_prompt():
 
 def logout_prompt():
     """
-    logs user out, and doesn't assume that they're logged in
+    Logs user out, and doesn't assume that they're logged in
     """
     if auth.logged_in():
         print (f"Goodbye, {auth.authenticated_user}... I hope to see you again.")
@@ -431,6 +458,9 @@ def logout_prompt():
         print ("Hey! You're not logged in. How'd you get here you hacker :(")
 
 def show_menu():
+    """
+    Displays the menu.
+    """
     menu = get_menu()
 
     if auth.logged_in():
@@ -446,6 +476,9 @@ def show_menu():
     print ()
 
 def get_nutrients():
+    """
+    Prompts the user for an item that they would like to learn the nutrients of.
+    """
     menu = get_menu()
     order_ids = set()
 
@@ -496,7 +529,7 @@ def get_nutrients():
 
 def create_order_menu():
     """
-    prompts for all items that user wants to add to the order
+    Prompts for all items that user wants to add to the order
     then submits order!
     """
     menu = get_menu()
@@ -557,7 +590,7 @@ def create_order_menu():
 
 def create_menu_item():
     """
-    prompts for all items that user wants to add to the order
+    Prompts for all items that user wants to add to the order
     then submits order!
     """
     ingredients = get_ingredients()
