@@ -260,6 +260,32 @@ def submit_menu_item (name, price, ingr_and_amounts):
         else:
             sys.stderr('Menu item creation failed. Please contact an administrator.')
 
+def retrieve_nutrients_of_item (item_id):
+    """
+    item_name:
+        name of the menu item
+    """
+
+    sql = 'SELECT protein_in_item(item_id) AS total_protein, carbs_in_item(item_id) AS total_carbs, fats_in_item(item_id) AS total_fats, sugars_in_item(item_id) AS total_sugars FROM item WHERE item_id = "%s";' % (item_id)
+
+    cursor = conn.cursor()
+    try:
+        cursor.execute(sql)
+        # row = cursor.fetchone()
+        rows = cursor.fetchall()
+        nutrients = []
+        for row in rows:
+            nutrients.append(row)
+        return nutrients
+    except mysql.connector.Error as err:
+        # If you're testing, it's helpful to see more details printed.
+        if DEBUG:
+            sys.stderr(err)
+            sys.exit(1)
+        else:
+            sys.stderr('Nutrients get failed. Please contact an administrator.')
+
+
 # ----------------------------------------------------------------------
 # Command-Line Functionality
 # ----------------------------------------------------------------------
@@ -293,7 +319,7 @@ def show_options():
     elif ans == 'm':
         show_menu()
     elif ans == 'd':
-        pass
+        get_nutrients()
     elif ans == 'l' and not auth.logged_in():
         login_prompt()
     elif ans == 'x' and auth.logged_in():
@@ -349,6 +375,52 @@ def show_menu():
         print (f"{item_name.ljust(30)}${price_usd}")
 
     print ()
+
+def get_nutrients():
+    menu = get_menu()
+    order_ids = set()
+
+    if not auth.logged_in():
+        print ("What are you doing here???")
+        return
+
+    print ("Let's find your nutrients!")
+
+    while True:
+        print ()
+        # print menu at the beginning always
+        for i in range(len(menu)):
+            item_id, item_name, price_usd = menu[i]
+            print (f"[{i+1}] {item_name.ljust(30)}${price_usd}")
+        print ('[c] Cancel')
+        print ()
+
+        ans = input('For which item would you like to check nutrients? ').lower()
+
+        if ans == 'c':
+            return
+        try:
+            ans_num = int(ans)
+            if ans_num >= 1 and ans_num <= len(menu):
+                item_id = ans_num
+                break
+            else:
+                print ("Invalid input")
+                continue
+        except:
+            print ("Invalid input")
+            continue
+
+    nutrients = retrieve_nutrients_of_item(item_id)
+
+    print('Here are the nutrients for your item:')
+    print()
+    
+    for p, c, f, s in nutrients:
+        print (f"{p} grams of protein")
+        print (f"{c} grams of carbs")
+        print (f"{f} grams of fat")
+        print (f"{s} grams of sugar")
 
 def create_order_menu():
     """
