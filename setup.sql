@@ -131,3 +131,5 @@ CREATE TABLE recipe (
     amount          NUMERIC(6, 2) NOT NULL,
     PRIMARY KEY (item_id, ingredient_id)
 );
+
+CREATE INDEX check_gluten ON ingr_details(has_gluten);

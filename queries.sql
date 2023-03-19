@@ -48,11 +48,10 @@ FROM    (SELECT item_id
         AS temp2;
 
 -- which items have gluten? (easily expanded to other allergens)
-SELECT 
-    item_name, 
-    SUM(has_gluten) > 0 AS has_gluten 
-FROM item NATURAL JOIN recipe NATURAL JOIN ingr_details 
-GROUP BY item_id;
+SELECT item_name 
+FROM item NATURAL JOIN recipe NATURAL JOIN (
+    SELECT ingredient_id FROM ingr_details WHERE has_gluten = 1
+) as temp1;
 
 -- who is red door's most loyal customer? (who ordered the most)
 SELECT username, COUNT(*) AS num_orders 
